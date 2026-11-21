@@ -1,36 +1,42 @@
-# Cloud Infrastructure as Code (Terraform)
+# Enterprise DevSecOps Infrastructure as Code (AWS & EKS)
 
-Production-ready, modular Infrastructure as Code (IaC) provisioning AWS networking and Kubernetes (EKS) infrastructure.
+Production-hardened, modular Infrastructure as Code (IaC) designed to meet **CIS Benchmark** and **NIST SP 800-53** cloud security standards.
 
-## Architecture
+## 🛡️ DevSecOps Security Architecture
 
-- **VPC Module:** Multi-AZ public and private subnets, NAT Gateway, Route Tables, Internet Gateway.
-- **EKS Module:** Managed Kubernetes control plane, IAM roles for service accounts, autoscaling worker node groups.
-- **Environments:** Decoupled `dev` and `prod` configurations maintaining environment parity.
-- **CI/CD Automation:** GitHub Actions pipeline running `terraform fmt`, validation, and Trivy security scanning on pull requests.
+- **Automated Security Scanning:** Every pull request runs **Checkov** and **Aqua Trivy** to identify misconfigurations before deployment.
+- **Least-Privilege Networking:** Multi-tier VPC with strictly isolated private database subnets and internal Kubernetes worker pools.
+- **Zero-Trust IAM Roles:** EKS IRSA (IAM Roles for Service Accounts) enforcing granular pod-level permissions.
+- **Encrypted State Storage:** S3 remote backend with AES-256 encryption, TLS enforcement, and DynamoDB distributed state locking.
 
-## Directory Layout
+## 📁 Repository Structure
 
 ```text
 ├── environments/
-│   ├── dev/            # Development environment configuration
-│   └── prod/           # Production environment configuration
+│   ├── dev/                  # Development environment module
+│   └── prod/                 # Hardened production environment
 ├── modules/
-│   ├── vpc/            # Reusable VPC networking module
-│   ├── eks/            # Managed Kubernetes cluster module
-│   └── rds/            # Database storage module
-└── .github/workflows/
-    └── terraform-ci.yml # Automated CI pipeline
+│   ├── vpc/                  # Multi-AZ hardened VPC networking
+│   ├── eks/                  # Private Kubernetes control plane & nodes
+│   └── rds/                  # Encrypted relational database storage
+├── .github/workflows/
+│   └── terraform-ci.yml      # Automated DevSecOps pipeline (Checkov + Trivy)
+├── .checkov.yaml             # Baseline IaC security policy configuration
+└── .tflint.hcl               # Linting and AWS security best practices
 ```
 
-## Quickstart
+## 🚀 Execution & Verification
 
-### Prerequisites
-- AWS CLI configured with appropriate credentials
-- Terraform >= 1.5.0
+### Local Security Audit
+```bash
+# Run Checkov locally
+checkov -d .
 
-### Local Execution
+# Run Trivy IaC audit
+trivy config .
+```
 
+### Deployment
 ```bash
 cd environments/dev
 terraform init

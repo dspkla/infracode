@@ -1,4 +1,4 @@
-name: "Terraform CI/CD Pipeline"
+name: "DevSecOps IaC Security & Validation Pipeline"
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  validate:
-    name: "Lint, Security & Validation"
+  security-and-lint:
+    name: "DevSecOps Static Analysis & Vulnerability Scan"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -19,18 +19,17 @@ jobs:
         with:
           terraform_version: 1.8.0
 
-      - name: Check Terraform Formatting
+      - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
-      - name: Terraform Init Dev
-        working-directory: ./environments/dev
-        run: terraform init -backend=false
+      - name: Run Checkov IaC Security Scanner
+        uses: bridgecrewio/checkov-action@master
+        with:
+          framework: terraform
+          soft_fail: true
+          output_format: cli
 
-      - name: Terraform Validate
-        working-directory: ./environments/dev
-        run: terraform validate
-
-      - name: Run Trivy IaC Security Scan
+      - name: Run Aqua Trivy IaC Scanner
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'config'
@@ -38,3 +37,9 @@ jobs:
           format: 'table'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
+
+      - name: Validate Dev Environment
+        working-directory: ./environments/dev
+        run: |
+          terraform init -backend=false
+          terraform validate

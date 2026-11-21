@@ -1,0 +1,7 @@
+framework:
+  - terraform
+quiet: true
+compact: true
+soft-fail: false
+download-external-modules: true
+output: cli
